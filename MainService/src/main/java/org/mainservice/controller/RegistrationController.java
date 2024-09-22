@@ -1,9 +1,12 @@
 package org.mainservice.controller;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.mainservice.DTO.UserRegistrationDTO;
 import org.mainservice.model.User;
 import org.mainservice.sevice.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -15,15 +18,14 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/registration")
+@RequiredArgsConstructor
 public class RegistrationController {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
     @PostMapping
-    public ResponseEntity<Void> registerUser(@Valid @RequestBody User user){
-        userService.addUser(user);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+    public ResponseEntity<?> registerUser(@Valid @RequestBody UserRegistrationDTO userRegistrationDTO){
+        return userService.addUser(userRegistrationDTO);
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
