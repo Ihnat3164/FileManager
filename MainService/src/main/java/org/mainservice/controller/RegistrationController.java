@@ -1,43 +1,34 @@
 package org.mainservice.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.mainservice.DTO.UserRegistrationDTO;
-import org.mainservice.model.User;
-import org.mainservice.sevice.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DuplicateKeyException;
-import org.springframework.http.HttpStatus;
+import org.mainservice.service.UserService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.FieldError;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/registration")
+@Tag(name = "Registration", description = "Controller for registration new users.")
 @RequiredArgsConstructor
 public class RegistrationController {
 
     private final UserService userService;
 
+    @Operation(summary = "Register a new user", description = "Registers a new user in the system with the provided details.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User successfully registered"),
+            @ApiResponse(responseCode = "400", description = "Invalid user data"),
+            @ApiResponse(responseCode = "409", description = "User already exists"),
+    })
     @PostMapping
-    public ResponseEntity<?> registerUser(@Valid @RequestBody UserRegistrationDTO userRegistrationDTO){
-        return userService.addUser(userRegistrationDTO);
+    public ResponseEntity<?> registerUser(@Parameter(description = "User registration details") @Valid @RequestBody UserRegistrationDTO userRegistrationDTO){
+        return userService.registerUser(userRegistrationDTO);
     }
 
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public Map<String, String> handleValidationExceptions(
-            MethodArgumentNotValidException ex) {
-        Map<String, String> errors = new HashMap<>();
-        ex.getBindingResult().getAllErrors().forEach((error) -> {
-            String fieldName = ((FieldError) error).getField();
-            String errorMessage = error.getDefaultMessage();
-            errors.put(fieldName, errorMessage);
-        });
-        return errors;
-    }
 }

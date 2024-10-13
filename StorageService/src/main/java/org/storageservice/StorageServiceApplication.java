@@ -1,15 +1,13 @@
-package org.mainservice;
+package org.storageservice;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class MainServiceApplication {
+public class StorageServiceApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(MainServiceApplication.class, args);
+        SpringApplication.run(StorageServiceApplication.class, args);
     }
+
 }
-
-//todo сделать также визуал ошибок
-
