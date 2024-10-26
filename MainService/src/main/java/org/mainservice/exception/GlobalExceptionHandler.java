@@ -41,4 +41,13 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleInvalidRoleException(InvalidRoleException e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
     }
+    @ExceptionHandler(UserAlreadyExistsException.class)
+    public ResponseEntity<String> handleUserAlreadyExists(UserAlreadyExistsException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(AuthenticationFailedException.class)
+    public ResponseEntity<String> handleAuthenticationFailedException(AuthenticationFailedException ex) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ex.getMessage());
+    }
 }

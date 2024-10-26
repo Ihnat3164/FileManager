@@ -13,7 +13,8 @@ import lombok.Data;
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "users_seq")
+    @SequenceGenerator(name = "users_seq", sequenceName = "users_seq", allocationSize = 1)
     @Schema(description = "Unique identifier of the user.", example = "1", accessMode = Schema.AccessMode.READ_ONLY)
     private Long id;
 

@@ -1,15 +1,20 @@
 package org.mainservice.service;
 
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
 import lombok.RequiredArgsConstructor;
 import org.mainservice.DTO.JwtRequest;
 import org.mainservice.DTO.JwtResponse;
 import org.mainservice.DTO.UserRegistrationDTO;
 import org.mainservice.component.JWTUtils;
+import org.mainservice.exception.AuthenticationFailedException;
 import org.mainservice.exception.ObjectNotFoundException;
+import org.mainservice.exception.UserAlreadyExistsException;
 import org.mainservice.model.User;
 import org.mainservice.repository.UserRepository;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -31,48 +36,42 @@ public class UserService  {
     private final AuthenticationManager authenticationManager;
     private final MyUserDetailsService myUserDetailsService;
 
-    public ResponseEntity<?> registerUser(UserRegistrationDTO userRegistrationDTO){
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
+    public UserRegistrationDTO registerUser(UserRegistrationDTO userRegistrationDTO){
 
-        if(userIsExist(userRegistrationDTO.getEmail())){
-            return new ResponseEntity<>("User is exist. Please login", HttpStatus.CONFLICT);
-        }
+        Optional.ofNullable(userRepository.findUserByEmail(userRegistrationDTO.getEmail()))
+                .ifPresent(user -> { throw new UserAlreadyExistsException("User with this email is exist: " + userRegistrationDTO.getEmail()); });
 
         User user = new User();
         user.setName(userRegistrationDTO.getName());
         user.setEmail(userRegistrationDTO.getEmail());
         user.setRole("USER");
 
-
         String encodedPassword = passwordEncoder.encode(userRegistrationDTO.getPassword());
         user.setPassword(encodedPassword);
 
-        return ResponseEntity.ok(userRepository.save(user));
+        userRepository.save(user);
+        return userRegistrationDTO;
     }
 
-    public ResponseEntity<?> createUser(User user){
-        if(userIsExist(user.getEmail())){
-            return new ResponseEntity<>("User is exist. Please login", HttpStatus.BAD_REQUEST);
-        }
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
+    public User createUser(User user){
+        Optional.ofNullable(userRepository.findUserByEmail(user.getEmail()))
+                .ifPresent(userOptional -> { throw new UserAlreadyExistsException("User with this email is exist: " + user.getEmail()); });
+
         String encodedPassword = passwordEncoder.encode(user.getPassword());
-        user.setPassword(encodedPassword);;
-        return ResponseEntity.ok(userRepository.save(user));
+        user.setPassword(encodedPassword);
+        return userRepository.save(user);
     }
-
-    private boolean userIsExist(String email){
-        return userRepository.findUserByEmail(email).isPresent();
-    }
-    private boolean userIsExist(Long id){return userRepository.findUserById(id).isPresent();}
 
     public List<User> getAllUsers(){
         return userRepository.findAll();
     }
 
-    public ResponseEntity<?> editUserById(Long id, User incompleteUser)  throws IllegalAccessException {
-        if(!userIsExist(id)){
-            throw new ObjectNotFoundException("User not found");
-        }
-
-        User existingUser = userRepository.findById(id).get();
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
+    public User editUserById(Long id, User incompleteUser)  throws IllegalAccessException {
+        User existingUser = userRepository.findById(id)
+                .orElseThrow(() -> new ObjectNotFoundException("User not found with id: " + id));
 
         Class<?> internClass= User.class;
         Field[] internFields=internClass.getDeclaredFields();
@@ -86,31 +85,25 @@ public class UserService  {
             }
             field.setAccessible(false);
         }
-        return ResponseEntity.ok(userRepository.save(existingUser));
+        return  userRepository.save(existingUser);
     }
 
-    public ResponseEntity<?> deleteUserById(Long id){
-        if(!userIsExist(id)){
-            throw new ObjectNotFoundException("User not found");
-        }
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
+    public void deleteUserById(Long id){
+        userRepository.findUserById(id).orElseThrow(() -> new ObjectNotFoundException("User not found with id: " + id));
         userRepository.deleteById(id);
-        return ResponseEntity.ok("User deleted");
     }
 
-    public Optional<User> findUserByEmail(String email){
-        return userRepository.findUserByEmail(email);
-    }
-
-    public ResponseEntity<?> createAuthToken(JwtRequest authRequest){
+    public JwtResponse createAuthToken(JwtRequest authRequest){
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequest.getEmail(), authRequest.getPassword()));
         }
         catch (BadCredentialsException ex){
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ex.getMessage() + " or user isn't exist");
+            throw new AuthenticationFailedException("User with this email isn't exist:" + authRequest.getEmail());
         }
         UserDetails userDetails = myUserDetailsService.loadUserByUsername(authRequest.getEmail());
         String token = jwtUtils.generateToken(userDetails);
-        return ResponseEntity.ok(new JwtResponse(token));
+        return new JwtResponse(token);
     }
 
 }

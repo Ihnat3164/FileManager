@@ -6,12 +6,10 @@ import lombok.RequiredArgsConstructor;
 import org.mainservice.DTO.JwtRequest;
 import org.mainservice.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -27,9 +25,9 @@ public class AuthenticationController {
             @ApiResponse(responseCode = "200", description = "User authenticated successfully, JWT token generated"),
             @ApiResponse(responseCode = "400", description = "Invalid credentials")
     })
-    @PostMapping("/api/login")
+    @GetMapping("/api/login")
     public ResponseEntity<?> authenticateUser(@Parameter(description = "User login details including email and password", required = true)
                                                   @RequestBody JwtRequest authRequest) {
-        return userService.createAuthToken(authRequest);
+        return ResponseEntity.ok(userService.createAuthToken(authRequest));
     }
 }

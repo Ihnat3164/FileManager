@@ -2,6 +2,9 @@ package org.mainservice.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import org.hibernate.annotations.GenericGenerator;
+
+import java.util.UUID;
 
 @Entity
 @Data
@@ -13,4 +16,9 @@ public class FileMeta {
     private String type;
     private String path;
     private String author;
+
+
+    public FileMeta() {
+        this.id = UUID.randomUUID().toString();
+    }
 }

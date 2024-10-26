@@ -28,7 +28,7 @@ public class RegistrationController {
     })
     @PostMapping
     public ResponseEntity<?> registerUser(@Parameter(description = "User registration details") @Valid @RequestBody UserRegistrationDTO userRegistrationDTO){
-        return userService.registerUser(userRegistrationDTO);
+        return ResponseEntity.ok(userService.registerUser(userRegistrationDTO));
     }
 
 }

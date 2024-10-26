@@ -7,15 +7,15 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.mainservice.DTO.FileMetaDTO;
 import org.mainservice.service.FileService;
+import org.mainservice.service.HttpService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.security.Principal;
-import java.util.List;
+
 
 @RestController
 @RequiredArgsConstructor
@@ -24,14 +24,15 @@ import java.util.List;
 public class FileController {
 
     private final FileService fileService;
+    private final HttpService httpService;
 
     @GetMapping
     @Operation(summary = "Get user files", description = "Retrieves the list of files belonging to the authenticated user.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "List of files successfully retrieved."),
     })
-    public List<FileMetaDTO> getUserFiles(Principal principal) {
-        return fileService.getFilesList(principal);
+    public ResponseEntity<?> getUserFiles(Principal principal) {
+        return ResponseEntity.ok(fileService.getFilesList(principal));
     }
 
     @GetMapping("/content")
@@ -43,7 +44,7 @@ public class FileController {
     })
     public ResponseEntity<?> getFileContent(@Parameter(name = "id", description = "ID of the file to retrieve content from.", required = true, example = "12345")
                                             @RequestParam(value = "id") String id, Principal principal) {
-        return ResponseEntity.ok(fileService.getFileContent(id, principal).getContent());
+        return ResponseEntity.ok(httpService.getTextFileById(id, principal).getContent());
     }
 
     @PatchMapping("/update")
@@ -57,7 +58,8 @@ public class FileController {
                                                @RequestParam(value = "id") String id,
                                                @Parameter(name = "content", description = "New content to update in the file.", required = true, example = "Updated file content")
                                                @RequestBody String content, Principal principal) throws JsonProcessingException {
-        return fileService.editFile(id, content, principal);
+        fileService.editFile(id, content, principal);
+        return ResponseEntity.ok("File updated");
     }
 
     @GetMapping("/download")
@@ -80,6 +82,15 @@ public class FileController {
     })
     public ResponseEntity<?> storeFile(@Parameter(name = "file", description = "File to upload.", required = true)
                                        @RequestParam MultipartFile file, Principal principal) throws IOException {
-        return fileService.putFile(file, principal);
+        return ResponseEntity.ok(fileService.putFile(file, principal));
+    }
+
+    @GetMapping("/search")
+    @Operation(summary = "Text search", description = "Retrieves the list of user's files according to the given text.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "List of files successfully retrieved."),
+    })
+    public ResponseEntity<?> searchByText(@Parameter(name = "content", description = "Text for search")@RequestBody String content, Principal principal){
+        return ResponseEntity.ok(httpService.findFileByContent(content, principal));
     }
 }

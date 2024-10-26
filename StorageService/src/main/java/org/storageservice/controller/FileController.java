@@ -3,7 +3,7 @@ package org.storageservice.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.storageservice.sevice.FileService;
+import org.storageservice.service.FileService;
 
 @RestController
 @RequestMapping("/storage/api/")
@@ -13,8 +13,13 @@ public class FileController {
     private final FileService fileService;
 
     @GetMapping
-    public ResponseEntity<?> sendFile(@RequestParam(value = "id") String id){
+    public ResponseEntity<?> sendFileById(@RequestParam(value = "id") String id){
         System.out.println(id);
-        return fileService.sendFile(id);
+        return ResponseEntity.ok(fileService.sendFile(id));
+    }
+
+    @GetMapping("/search/")
+    public ResponseEntity<?> sendFileByContent(@RequestParam(value= "content") String content){
+        return ResponseEntity.ok(fileService.findFileByContent(content));
     }
 }

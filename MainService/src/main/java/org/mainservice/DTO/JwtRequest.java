@@ -1,9 +1,11 @@
 package org.mainservice.DTO;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
+@AllArgsConstructor
 @Schema(description = "DTO representing user's login credentials.")
 public class JwtRequest {
     @Schema(description = "The email address of the user.", example = "user@example.com")
