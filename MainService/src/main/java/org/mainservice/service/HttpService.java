@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.springframework.web.client.RestTemplate;
 
+
 import java.security.Principal;
 import java.util.List;
 import java.util.Set;
@@ -38,7 +39,8 @@ public class HttpService {
         return restTemplate.getForObject(url, TextFileDTO.class);
     }
 
-    public List<TextFileDTO> findFileByContent(String content, Principal principal){
+    public List<TextFileDTO> findFileByContent(String content, Principal principal) {
+
         String url = UriComponentsBuilder.fromHttpUrl("http://localhost:8081/storage/api/search/?")
                 .queryParam("content", content)
                 .toUriString();

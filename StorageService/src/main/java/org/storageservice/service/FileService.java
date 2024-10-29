@@ -7,8 +7,11 @@ import org.storageservice.model.TextFileElastic;
 import org.storageservice.repository.FileRepositoryMongodb;
 import org.storageservice.repository.FileRepositoryElastic;
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.NoSuchElementException;
+
 
 @Service
 @RequiredArgsConstructor
@@ -50,6 +53,7 @@ public class FileService {
     }
 
     public List<TextFileElastic> findFileByContent(String content){
-        return fileRepositoryElastic.searchByContent(content);
+        String decodedContent = URLDecoder.decode(content, StandardCharsets.UTF_8);
+        return fileRepositoryElastic.searchByContent(decodedContent);
     }
 }

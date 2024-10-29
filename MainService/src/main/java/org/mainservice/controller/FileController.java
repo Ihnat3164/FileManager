@@ -29,7 +29,7 @@ public class FileController {
     @GetMapping
     @Operation(summary = "Get user files", description = "Retrieves the list of files belonging to the authenticated user.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "List of files successfully retrieved."),
+            @ApiResponse(responseCode = "200", description = "List of files successfully retrieved. If no files are found, an empty list [] will be returned"),
     })
     public ResponseEntity<?> getUserFiles(Principal principal) {
         return ResponseEntity.ok(fileService.getFilesList(principal));
@@ -88,9 +88,9 @@ public class FileController {
     @GetMapping("/search")
     @Operation(summary = "Text search", description = "Retrieves the list of user's files according to the given text.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "List of files successfully retrieved."),
+            @ApiResponse(responseCode = "200", description = "List of files successfully retrieved. If no files are found, an empty list [] will be returned"),
     })
-    public ResponseEntity<?> searchByText(@Parameter(name = "content", description = "Text for search")@RequestBody String content, Principal principal){
+    public ResponseEntity<?> searchByText(@Parameter(name = "content", description = "Text for search")@RequestBody String content, Principal principal) {
         return ResponseEntity.ok(httpService.findFileByContent(content, principal));
     }
 }

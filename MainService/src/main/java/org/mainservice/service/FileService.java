@@ -124,7 +124,7 @@ public class FileService {
     }
 
     public void editFile(String id, String content, Principal principal) throws JsonProcessingException {
-        FileMeta fileMeta = fileRepository.findFileMetaByAuthorAndId(principal.getName(),id).orElseThrow(() -> new ObjectNotFoundException("File not found"));
+        FileMeta fileMeta = fileRepository.findFileMetaByAuthorAndId(principal.getName(),id).orElseThrow(() -> new ObjectNotFoundException("File not found with id: "+ id));
         if (!fileMeta.getType().startsWith("text/")) {
             throw new InvalidFileTypeException("File's type: " + fileMeta.getType() + ", but file have to be text.");
         }

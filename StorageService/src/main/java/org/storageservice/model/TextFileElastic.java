@@ -11,6 +11,6 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 public class TextFileElastic {
     @Id
     private String id;
-    @Field(type = FieldType.Text, analyzer = "standard")
+    @Field(type = FieldType.Text, analyzer = "standard", searchAnalyzer = "standard")
     private String content;
 }

@@ -24,7 +24,6 @@ import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Field;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -39,8 +38,10 @@ public class UserService  {
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
     public UserRegistrationDTO registerUser(UserRegistrationDTO userRegistrationDTO){
 
-        Optional.ofNullable(userRepository.findUserByEmail(userRegistrationDTO.getEmail()))
-                .ifPresent(user -> { throw new UserAlreadyExistsException("User with this email is exist: " + userRegistrationDTO.getEmail()); });
+        userRepository.findUserByEmail(userRegistrationDTO.getEmail())
+                .ifPresent(userCheck -> {
+                    throw new UserAlreadyExistsException("User with this email exists: " + userRegistrationDTO.getEmail());
+                });
 
         User user = new User();
         user.setName(userRegistrationDTO.getName());
@@ -56,8 +57,10 @@ public class UserService  {
 
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
     public User createUser(User user){
-        Optional.ofNullable(userRepository.findUserByEmail(user.getEmail()))
-                .ifPresent(userOptional -> { throw new UserAlreadyExistsException("User with this email is exist: " + user.getEmail()); });
+        userRepository.findUserByEmail(user.getEmail())
+                .ifPresent(userCheck -> {
+                    throw new UserAlreadyExistsException("User with this email exists: " + user.getEmail());
+                });
 
         String encodedPassword = passwordEncoder.encode(user.getPassword());
         user.setPassword(encodedPassword);

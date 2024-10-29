@@ -13,10 +13,3 @@ CREATE TABLE "meta-inf" (
                             path VARCHAR(255),
                             author VARCHAR(100)
 );
-
--- CREATE SEQUENCE users_seq
---     INCREMENT BY 1
---     START WITH 1
---     NO MINVALUE
---     NO MAXVALUE
---     CACHE 1;

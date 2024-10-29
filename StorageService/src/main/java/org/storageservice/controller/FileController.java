@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.storageservice.service.FileService;
 
+
 @RestController
 @RequestMapping("/storage/api/")
 @RequiredArgsConstructor
@@ -19,7 +20,7 @@ public class FileController {
     }
 
     @GetMapping("/search/")
-    public ResponseEntity<?> sendFileByContent(@RequestParam(value= "content") String content){
+    public ResponseEntity<?> sendFileByContent(@RequestParam(value= "content") String content) {
         return ResponseEntity.ok(fileService.findFileByContent(content));
     }
 }
