@@ -1,5 +1,6 @@
 package org.mainservice.service;
 
+import org.mainservice.repository.FileRepository;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,16 +25,19 @@ import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Field;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
 public class UserService  {
 
+    private final FileRepository fileRepository;
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
     private final JWTUtils jwtUtils;
     private final AuthenticationManager authenticationManager;
     private final MyUserDetailsService myUserDetailsService;
+    private final FileService fileService;
 
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
     public UserRegistrationDTO registerUser(UserRegistrationDTO userRegistrationDTO){
@@ -93,7 +97,12 @@ public class UserService  {
 
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
     public void deleteUserById(Long id){
-        userRepository.findUserById(id).orElseThrow(() -> new ObjectNotFoundException("User not found with id: " + id));
+        User user = userRepository.findUserById(id)
+                .orElseThrow(() -> new ObjectNotFoundException("User not found with id: " + id));
+        Set<String> allId = fileRepository.findFileMetaByAuthor(user.getEmail());
+        for(String f_id : allId){
+            fileService.deleteFileById(f_id,user.getEmail());
+        }
         userRepository.deleteById(id);
     }
 

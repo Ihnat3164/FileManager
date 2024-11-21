@@ -132,4 +132,27 @@ public class FileService {
         kafkaProducer.updateText(textFileDTO);
     }
 
+    public String deleteFileById(String id, String email){
+        FileMeta fileMeta = fileRepository.findFileMetaByAuthorAndId(email, id)
+                .orElseThrow(() -> new ObjectNotFoundException("File not found with id: " + id));
+        fileRepository.deleteById(id);
+
+        if ("mongodb".equals(fileMeta.getPath())) {
+            return httpService.deleteFileById(id);
+        }
+
+        Path path = Paths.get("C:\\OTHERS\\unik\\Java\\temp\\ProjectFiles\\" + fileMeta.getTitle());
+        try {
+            if (Files.exists(path)) {
+                Files.delete(path);
+                return "File deleted successfully from local storage.";
+            } else {
+                return "Local file not found.";
+            }
+        } catch (IOException e) {
+            return "Error deleting file: " + e.getMessage();
+
+    }
+    }
+
 }

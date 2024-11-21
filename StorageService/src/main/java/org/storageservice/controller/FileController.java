@@ -16,11 +16,16 @@ public class FileController {
     @GetMapping
     public ResponseEntity<?> sendFileById(@RequestParam(value = "id") String id){
         System.out.println(id);
-        return ResponseEntity.ok(fileService.sendFile(id));
+        return ResponseEntity.ok(fileService.getFile(id));
     }
 
     @GetMapping("/search/")
     public ResponseEntity<?> sendFileByContent(@RequestParam(value= "content") String content) {
         return ResponseEntity.ok(fileService.findFileByContent(content));
+    }
+
+    @DeleteMapping
+    public ResponseEntity<?> deleteFileById(@RequestParam String id){
+        return ResponseEntity.ok(fileService.deleteFileById(id));
     }
 }

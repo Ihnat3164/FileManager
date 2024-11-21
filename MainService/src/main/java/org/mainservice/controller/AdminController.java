@@ -13,6 +13,8 @@ import org.mainservice.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
+
 
 @RestController
 @RequestMapping("/api/admin/users")
@@ -68,6 +70,7 @@ public class AdminController {
     public ResponseEntity<?> deleteUser(
             @Parameter(description = "ID of the user to be deleted.")
             @RequestParam(value = "id" ,required = false) Long id){
+        System.out.println("Check");
         userService.deleteUserById(id);
         return ResponseEntity.ok("User deleted");
     }

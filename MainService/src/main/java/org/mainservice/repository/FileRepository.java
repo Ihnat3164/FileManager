@@ -19,4 +19,5 @@ public interface FileRepository extends JpaRepository<FileMeta,String> {
      Set<String> findFileMetaByAuthor(@Param("name") String email);
      Optional<FileMeta> findFileMetaById(String id);
      Optional<FileMeta> findFileMetaByAuthorAndId(String email, String id);
+     void deleteById(String id);
 }

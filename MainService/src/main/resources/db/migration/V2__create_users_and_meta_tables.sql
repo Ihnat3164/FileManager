@@ -11,5 +11,5 @@ CREATE TABLE "meta-inf" (
                             title VARCHAR(255),
                             type VARCHAR(100),
                             path VARCHAR(255),
-                            author VARCHAR(100)
+                            author VARCHAR(100) REFERENCES USERS(email) ON DELETE CASCADE
 );

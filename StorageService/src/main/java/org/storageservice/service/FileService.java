@@ -29,7 +29,7 @@ public class FileService {
         fileRepositoryMongodb.save(textFile);
     }
 
-    public TextFileMongodb sendFile(String id) {
+    public TextFileMongodb getFile(String id) {
         return fileRepositoryMongodb.findTextFileById(id)
                 .orElse(null); // Вернёт null, если файл не найден
     }
@@ -55,5 +55,14 @@ public class FileService {
     public List<TextFileElastic> findFileByContent(String content){
         String decodedContent = URLDecoder.decode(content, StandardCharsets.UTF_8);
         return fileRepositoryElastic.searchByContent(decodedContent);
+    }
+
+    public String deleteFileById(String id) {
+        if (fileRepositoryMongodb.existsById(id)) {
+            fileRepositoryMongodb.deleteById(id);
+            return "File was deleted successfully.";
+        } else {
+            return "File with id " + id + " not found.";
+        }
     }
 }

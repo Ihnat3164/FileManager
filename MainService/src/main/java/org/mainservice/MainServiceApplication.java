@@ -12,3 +12,6 @@ public class MainServiceApplication {
 }
 
 //todo удаление файлов
+
+//swagger до конца
+// вернуть прежние порты

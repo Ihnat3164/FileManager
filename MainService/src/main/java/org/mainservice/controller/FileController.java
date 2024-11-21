@@ -93,4 +93,9 @@ public class FileController {
     public ResponseEntity<?> searchByText(@Parameter(name = "content", description = "Text for search")@RequestBody String content, Principal principal) {
         return ResponseEntity.ok(httpService.findFileByContent(content, principal));
     }
+
+    @DeleteMapping
+    public ResponseEntity<?> deleteFile(@RequestParam String id, Principal principal){
+        return ResponseEntity.ok(fileService.deleteFileById(id, principal.getName()));
+    }
 }

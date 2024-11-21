@@ -57,5 +57,14 @@ public class HttpService {
                 .filter(file -> usersFiles.contains(file.getId()))
                 .collect(Collectors.toList());
     }
+
+    public String deleteFileById(String id){
+
+        String url = UriComponentsBuilder.fromHttpUrl("http://localhost:8081/storage/api/?")
+                .queryParam("id", id)
+                .toUriString();
+
+        return restTemplate.exchange(url, HttpMethod.DELETE, null, String.class).getBody();
+    }
 }
 
